@@ -15,7 +15,7 @@ contatos_tdp <- contatos_sheet %>%
   gs_read()
 
 
-setwd("C:/Users/jvoig/Desktop/contatos/")
+setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\planilhas_exportadas_admin_tdp")
 write.table(contatos_tdp, file="contatos_upload.csv",
             row.names = FALSE, fileEncoding = "utf-8",
             quote = FALSE, sep=",", na= "")
