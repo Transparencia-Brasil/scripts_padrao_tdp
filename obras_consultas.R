@@ -30,7 +30,8 @@ filtro_google_situacao <- c("Inacabada",
 
 obras_google <- obras %>%
   filter(Tipo.do.Projeto %in% filtro_google_tipodeprojeto ) %>%
-  filter(Situação %in% filtro_google_situacao ) 
+  filter(Situação %in% filtro_google_situacao ) %>%
+  filter(Rede.de.Ensino.Público == "Municipal")
 
 
 #Para ter uma lista de municípios com obras:
