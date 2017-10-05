@@ -10,6 +10,14 @@ obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep="
 #de importação
 
 
+#tirando os ; da planilha
+
+obras[] <- lapply(obras, gsub, pattern=';', replacement='/')
+
+#deixando tudo em caixa baixa:
+
+obras <- mutate_all(obras, funs(tolower))
+
 #inserindo o header padrão
 #isso é necessário porque o SIMEC muda o header o tempo todo.
 
