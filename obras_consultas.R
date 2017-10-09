@@ -34,14 +34,19 @@ obras_google <- obras %>%
   filter(Rede.de.Ensino.Público == "Municipal")
 
 
-#Para ter uma lista de municípios com obras:
-#aqui não precisa alterar nada
+#Esse comando abaixo cria um objeto com a lista de município que está
+# no app e o número de obras contidas em cada um. Não é necessário alterar
+# nada
 
 
 obras_google_munic <- obras_google %>%
   mutate(num=1) %>%
   group_by(Município, UF) %>%
   summarise(obras = sum(num))
+
+#Salvar: 
+
+setwd("inserir aqui o destino")
 
 write.table(obras_google_munic, file="obras_google_munic.csv", 
             sep=";", row.names=F, na="")
@@ -50,10 +55,19 @@ write.table(obras_google_munic, file="obras_google_munic.csv",
 ## Para conseguir as escolas em um município X 
 ## (substituir o X pelo nome do município e o Y pelo estado)
 
-
-obras_google_X <- obras_google %>%                                      #substituir
-  filter(Município %in% c("X")) %>%                                     #substituir
+obras_gooole_X <- obras_google %>%
+  filter( UF == "Y",                    #substituir
+          Município %in% c("X")) %>%    #substituir
   select(id, Nome, Município, CEP, Logradouro, Bairro)
 
-write.table(obras_google_al, file="obras_google_al.csv", 
+#importante: se estiver com dúvidas sobre a grafia do município ou uf, rode:
+
+unique(obras_google$Município)
+unique(obras_google$UF)
+
+#Salvar: 
+
+setwd("inserir aqui o destino")
+
+write.table(obras_google_x, file="obras_google_x.csv", 
             sep=";", row.names=F, na="", quote = F)
