@@ -1,6 +1,8 @@
 
 #Script para upar plhanilha no admin do TDP
 
+library(dplyr)
+
 #inserindo obras SIMEC
 
 obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";")
