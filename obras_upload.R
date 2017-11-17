@@ -16,9 +16,6 @@ obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep="
 
 obras[] <- lapply(obras, gsub, pattern=';', replacement='/')
 
-#deixando tudo em caixa baixa:
-
-obras <- mutate_all(obras, funs(tolower))
 
 #inserindo o header padrão
 #isso é necessário porque o SIMEC muda o header o tempo todo.
@@ -88,4 +85,6 @@ names(obras) <- c( "ID"
 
 setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\Planilhas\\planilhas_upload")
 
-write.table(obras, file="obras_upload.csv", sep=";", fileEncoding = "utf-8", row.names = FALSE )
+write.table(obras, file="obras_upload.csv", sep=";", 
+            fileEncoding = "utf-8", row.names = FALSE,
+            na ="")
