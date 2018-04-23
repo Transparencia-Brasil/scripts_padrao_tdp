@@ -61,8 +61,9 @@ projeto_conhecido <- execucao$projeto
 
 atrasadas_oficial <- obras_1 %>%
   filter(data_de_termino < hoje) %>%
-  mutate(data_final_ideal = NA) %>%
-  select(id, nome, situacao, municipio, uf, cep, logradouro, bairro, termo_convenio,
+  mutate(data_final_ideal = NA,
+         tipo_atraso = "Em relação à data prevista de conclusão da obra") %>%
+  select(id, nome, situacao,tipo_atraso, municipio, uf, cep, logradouro, bairro, termo_convenio,
          fim_da_vigencia_termo_convenio, situacao_do_termo_convenio, percentual_de_execucao,
          data_de_inicio, data_de_termino, data_final_ideal, tipo_do_projeto, tipo_de_ensino_modalidade, tipo_da_obra,
          valor_pactuado_pelo_fnde, percentual_pago)
@@ -76,9 +77,10 @@ atrasadas_real <- obras_1 %>%
          tipo_do_projeto %in% projeto_conhecido)%>%
   left_join(execucao, by=c("tipo_do_projeto" = "projeto"))%>%
   mutate(execucao_dias = as.numeric(execucao)*30,
-         data_final_ideal = data_de_inicio + execucao_dias) %>%
+         data_final_ideal = data_de_inicio + execucao_dias,
+         tipo_atraso = "Em relação à data de início + cronograma") %>%
   filter(data_final_ideal < hoje) %>%
-  select(id, nome, situacao, municipio, uf, cep, logradouro, bairro, termo_convenio,
+  select(id, nome, situacao,tipo_atraso, municipio, uf, cep, logradouro, bairro, termo_convenio,
          fim_da_vigencia_termo_convenio, situacao_do_termo_convenio, percentual_de_execucao,
          data_de_inicio, data_de_termino, data_final_ideal, tipo_do_projeto, tipo_de_ensino_modalidade, tipo_da_obra,
          valor_pactuado_pelo_fnde, percentual_pago)
@@ -86,6 +88,11 @@ atrasadas_real <- obras_1 %>%
   
 atrasadas_real_oficial <- bind_rows(atrasadas_real, atrasadas_oficial)%>%
   arrange(desc(data_de_termino))
+
+atrasadas_real_oficial %>%
+  nrow()
+
+# 5259 obras
 
 atrasadas_real_oficial %>%
   group_by(municipio, uf) %>%
