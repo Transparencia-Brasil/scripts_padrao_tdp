@@ -1,10 +1,22 @@
 library(dplyr)
 library(janitor)
 
-#obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";", na.strings = "")
+#obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";", 
+# na.strings = "")
+# save(obras, file="obras20042018.Rdata")
 
-setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\scripts_padrao_tdp")
 load("obras20042018.Rdata")
+
+filtro_not_work <- {c("Ampliação",
+                     "Espaço Educativo Ensino Médio Profissionalizante",
+                     "Reforma",
+                     "QUADRA ESCOLAR COBERTA COM PALCO- PROJETO FNDE",
+                     "QUADRA ESCOLAR COBERTA COM VESTIÁRIO- PROJETO FNDE",
+                     "QUADRA ESCOLAR COBERTA - PROJETO PRÓPRIO",
+                     "COBERTURA DE QUADRA ESCOLAR PEQUENA - PROJETO FNDE",
+                     "COBERTURA DE QUADRA ESCOLAR GRANDE - PROJETO FNDE",
+                     "COBERTURA DE QUADRA ESCOLAR - PROJETO PRÓPRIO")}
+`%notin%` = function(x,y) !(x %in% y)
 
 #Objetivo: 
 # 1 . Encontrar todas as obras que já deviam ter sido terminadas independentemente de termos
@@ -24,7 +36,8 @@ obras_1 <- obras %>%
          hoje = as.Date("2018-04-20")) %>%
   filter(!is.na(data_de_inicio),
          situacao !="Concluída",
-         situacao !="Obra Cancelada")
+         situacao !="Obra Cancelada",
+         tipo_do_projeto %notin% filtro_not_work)
 
 #b. cronogramas:
 
@@ -58,8 +71,6 @@ id_atrasadas_oficial <- atrasadas_oficial$id
 
 #2 Atrasadas não oficialmente
 
-`%notin%` = function(x,y) !(x %in% y)
-
 atrasadas_real <- obras_1 %>%
   filter(id %notin% id_atrasadas_oficial,
          tipo_do_projeto %in% projeto_conhecido)%>%
@@ -76,12 +87,12 @@ atrasadas_real <- obras_1 %>%
 atrasadas_real_oficial <- bind_rows(atrasadas_real, atrasadas_oficial)%>%
   arrange(desc(data_de_termino))
 
-x <- atrasadas_real_oficial %>%
+atrasadas_real_oficial %>%
   group_by(municipio, uf) %>%
-  summarise(obras=n())
+  summarise(obras=n()) %>%
+  nrow()
 
-setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\scripts_padrao_tdp")
+# 2412 municípios
+
 save(atrasadas_real_oficial, file="atrasadas_real_oficial.Rdata")
-save(obras, file="obras20042018.Rdata")
-
 write.csv(atrasadas_real_oficial, file="atrasadas_real_oficial.csv", row.names = FALSE)
