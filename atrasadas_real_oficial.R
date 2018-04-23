@@ -1,7 +1,10 @@
 library(dplyr)
 library(janitor)
 
-obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";", na.strings = "")
+#obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";", na.strings = "")
+
+setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\scripts_padrao_tdp")
+load("obras20042018.Rdata")
 
 #Objetivo: 
 # 1 . Encontrar todas as obras que já deviam ter sido terminadas independentemente de termos
@@ -79,5 +82,6 @@ x <- atrasadas_real_oficial %>%
 
 setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\scripts_padrao_tdp")
 save(atrasadas_real_oficial, file="atrasadas_real_oficial.Rdata")
+save(obras, file="obras20042018.Rdata")
 
 write.csv(atrasadas_real_oficial, file="atrasadas_real_oficial.csv", row.names = FALSE)
