@@ -1,0 +1,76 @@
+---
+title: "PostGreSQL"
+author: "Jessica Voigt"
+date: "22 de maio de 2018"
+output: html_document
+---
+
+Vou documentar como usar a biblioteca *RPostgreSQL* ([CRAN aqui](https://cran.r-project.org/web/packages/RPostgreSQL/RPostgreSQL.pdf)) e acessar o banco do TDP.
+Tutorial [aqui] (http://www.win-vector.com/blog/2016/02/using-postgresql-in-r/)
+
+**Conexão**
+
+```{r, eval = FALSE}
+library(RPostgreSQL)
+library(dplyr)
+library(knitr)
+
+pg = dbDriver("PostgreSQL")
+
+con = dbConnect(pg,
+                user="read_only_user", password=pass,
+                host ="aag6rh5j94aivq.cxbz7geveept.sa-east-1.rds.amazonaws.com",
+                port = 5432, dbname="ebdb")
+
+```
+
+Conectamos :)
+
+Agora eu posso **fazer as querys**. No caso eu vou ver os alertas (*inspections*) que foram feitos no TDP. Mais informações sobre esse DB podem ser encontrados na [documentação da API do TDP](https://tadepe.docs.apiary.io/#)
+
+```{r, eval = FALSE}
+
+alertas = dbGetQuery(con, "select * from inspections i")
+
+```
+
+## Quantos alertas recebemos ao longo de todo o período?
+
+O parâmetro status pode assumir os seguintes valores:
+
+1. pending - Alerta não analisado
+2. rejected - Alerta rejeitado, obra não está atrasada
+3. accepted - Alerta aceito, obra está atrasada
+4. sent - Alerta enviado para instância responsável
+5. answered - Alerta respondido pela instância responsável
+6 .discarded - Alerta descartado.
+
+```{r, eval=TRUE}
+
+status_names <- data.frame("status" = 1:7, situacao = c("pending", "rejected", "accepted", "sent", "answered", "discarded", "concluídos"))
+
+alertas %>%
+  filter(created_at > 2017-08-14) %>%
+  group_by(status) %>%
+  summarise(alertas = n()) %>%
+  left_join(status_names) %>%
+  select(situacao, alertas) %>%
+  kable(caption="Alertas recebidos")
+
+```
+
+Alertas que foram feitos na época da exposição do grupo controle. De acordo com levantamento feitona época, os Ids dos alertas eram **364** e **181** :
+
+```{r,warning = FALSE, message = FALSE, eval = TRUE}
+
+tbl_alertas_controle = dbGetQuery(con, "SELECT i.id AS id_alerta, i.status AS status_alerta, i.created_at AS data_envio_alerta, m.contact_id AS id_contato_mensagem, c.name AS orgao_contato, a.content AS conteudo_msg_resposta 
+FROM inspections i
+LEFT JOIN messages m ON i.id=m.inspection_id
+LEFT JOIN contacts c ON m.contact_id=c.id
+LEFT JOIN answers a ON m.id=a.message_id
+WHERE(i.id IN (364, 181));")
+
+tbl_alertas_controle %>% kable()
+
+```
+
