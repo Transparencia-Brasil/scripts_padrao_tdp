@@ -8,7 +8,7 @@ url_contatos <- "https://docs.google.com/spreadsheets/d/1cxk1KUvncZ8SiavMmGkP4lY
 gs_ls() 
 
 #Importando:
-contatos_sheet <- gs_title("TDP_Contatos_produção_nova")
+contatos_sheet <- gs_title("planilha_final_contatos")
 
 #Atribuindo o df a um objeto:
 contatos_tdp <- contatos_sheet %>%
