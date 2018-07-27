@@ -2,8 +2,6 @@ library(readxl)
 library(googlesheets)
 library(dplyr)
 
-url_contatos <- "https://docs.google.com/spreadsheets/d/1cxk1KUvncZ8SiavMmGkP4lYXjQ-7KD4corBjqkMjOxA/edit?usp=sharing"
-
 #Autenticação:
 gs_ls() 
 
