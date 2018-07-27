@@ -6,7 +6,7 @@ library(dplyr)
 gs_ls() 
 
 #Importando:
-contatos_sheet <- gs_title("planilha_final_contatos")
+contatos_sheet <- gs_title("planilha_contatos_producao_tdp")
 
 #Atribuindo o df a um objeto:
 contatos_tdp <- contatos_sheet %>%
