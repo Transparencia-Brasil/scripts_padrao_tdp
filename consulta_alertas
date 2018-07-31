@@ -1,0 +1,45 @@
+## Conexão
+
+library(RPostgreSQL)
+library(dplyr)
+library(readxl)
+library(janitor)
+
+pg = dbDriver("PostgreSQL")
+
+con = dbConnect(pg,
+                user="read_only_user", password="",
+                host ="aag6rh5j94aivq.cxbz7geveept.sa-east-1.rds.amazonaws.com",
+                port = 5432, dbname="ebdb")
+
+alertas = dbGetQuery(con, "select * from inspections i")
+
+## Quantos alertas recebemos ao longo de todo o período?
+
+status_names <- data.frame("status" = 1:7, situacao = c("pending", "rejected", 
+                                                        "accepted", "sent", 
+                                                        "answered", "discarded", 
+                                                        "concluídos"))
+
+alertas %>%
+  filter(created_at > 2017-08-14) %>%
+  group_by(status) %>%
+  summarise(alertas = n()) %>%
+  left_join(status_names) %>%
+  select(situacao, alertas) %>%
+  filter(situacao != "discarded") %>%
+  adorn_totals("row")
+
+alertas %>%
+  filter(created_at > 2017-08-14) %>%
+  left_join(status_names) %>%
+  filter(situacao != "discarded") %>%
+  filter(!grepl("teste", comment),
+         !grepl("Teste", comment),
+         !grepl("TESTE", comment),
+         !grepl("Deletar", comment),
+         !grepl("Test", comment),
+         !grepl("123", comment)) %>%
+  group_by(situacao) %>%
+  summarise(alertas = n()) %>%
+  adorn_totals("row")
