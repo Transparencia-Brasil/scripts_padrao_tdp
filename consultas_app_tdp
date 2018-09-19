@@ -1,0 +1,97 @@
+#Dados tdp para Press release
+library(readr)
+library(dplyr)
+
+#Bancos:
+staus <- data.frame(status_id = as.character((1:8)),
+                    status_name = c("pending", "rejected", "accepted", "sent",
+                                    "answered", "discarded", "evaluating", "concluded"))
+
+
+status_incongruity: { incongruity_pending: 1, incongruity_sent: 2, incongruity_answered: 3, incongruity_concluded: 4 }
+
+messages <- read_csv("C:/Users/jvoig/Desktop/messages.csv", 
+                     col_types = cols(contact_id = col_character(), 
+                                      id = col_character(), inspection_id = col_character(), 
+                                      status = col_character()))
+
+messages <- messages %>%
+  rename(message_id = id)
+
+answers <- read_csv("C:/Users/jvoig/Desktop/answers.csv", 
+                    col_types = cols(id = col_character(), 
+                                     message_id = col_character()))
+answers <- answers %>%
+  rename(answers_id = id)
+
+
+inspections <- read_csv("C:/Users/jvoig/Desktop/inspections.csv", 
+                        col_types = cols(id = col_character(), 
+                                         project_id = col_character(), status = col_character(), 
+                                         user_id = col_character()))
+inspections <- inspections %>%
+  left_join(staus, by=c("status" = "status_id"))
+
+
+obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";")
+
+projects <- obras %>%
+  rename(project_id = ID) %>%
+  mutate_all(as.character)
+
+#tirando os ids teste:
+testers <- inspections %>%
+  filter(comment %in% c("Teste", "teste", "test", "Pandô", "Jessica"))
+testers <- unique(testers$user_id)
+testers <- c(testers, "2547", "2", "2387", "784", "2994", "756", "737", "2386", "3140",
+             "2436", "3152", "1004", "2908", "2158", "3104", "2334", "2292")
+
+# 1. Alertas recebidos:
+
+inspections %>%
+  filter(!user_id %in% testers,
+         status != 6) %>% #evistando testes
+  nrow() #222
+
+#1.1 municipios que receberam alerta:
+
+inspections %>%
+  filter(!user_id %in% testers,
+         status != 6) %>%
+  left_join(projects, by=c("project_id")) %>%
+  filter(!is.na(Nome)) %>%
+  distinct( UF) %>%
+  nrow()
+
+#59 municípios
+
+#2. Descobrindo quantos alertas receberam respostas
+
+respostas <- inspections %>%
+  filter(!user_id %in% testers,
+         !status %in% c("6", "2")) %>% #evistando alertas teste
+  left_join(messages, by=c("id"="inspection_id")) %>%
+  inner_join(answers, by=c("message_id" = "message_id")) %>%
+  distinct(answers_id, .keep_all = TRUE)  %>% #97
+  group_by(id) %>%
+  mutate(dup = n())
+
+respostas %>% distinct(id) %>% nrow() #87 receberam alguma resposta
+inspections %>% filter(status == 5) %>% nrow() #75 foram considerados como respondidos
+
+#3. quantos ainda precisam receber resposta
+
+inspections %>%
+  filter(!user_id %in% testers,
+         !status %in% c("2", "6", "5")) %>%
+  nrow() 
+
+# 114 alertas aguardam resposta
+
+#alertas sem indícios de atraso:
+
+x <- inspections %>%
+  filter(!user_id %in% testers,
+         status == "2") 
+
+#39
