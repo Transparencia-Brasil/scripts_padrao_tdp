@@ -80,11 +80,15 @@ names(obras) <- c( "ID"
                    , "Saldo TOTAL")
 
 
+hj <- Sys.Date()
+
 #colocar pasta de destino:
 
+dir <- getwd()
+pasta <- paste0(dir, "/", "planilhas_upload")
 
-setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\Planilhas\\planilhas_upload")
+setwd(pasta)
 
-write.table(obras, file="obras_upload.csv", sep=";", 
+write.table(obras, file=paste0("obras", hj, ".csv"), sep=";", 
             fileEncoding = "utf-8", row.names = FALSE,
             na ="")
