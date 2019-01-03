@@ -12,8 +12,12 @@ contatos_sheet <- gs_title("planilha_contatos_producao_tdp")
 contatos_tdp <- contatos_sheet %>%
   gs_read()
 
+dir <- getwd()
+destino <- paste0(dir, "/contatos_upload")
+setwd(destino)
 
-setwd("C:\\Users\\jvoig\\OneDrive\\Documentos\\tadepe\\planilhas_exportadas_admin_tdp")
-write.table(contatos_tdp, file="contatos_upload.csv",
+hj <- Sys.Date()
+
+write.table(contatos_tdp, file=paste0(hj, "contatos_upload.csv"),
             row.names = FALSE, fileEncoding = "utf-8",
             quote = FALSE, sep=",", na= "")
