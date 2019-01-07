@@ -1,0 +1,39 @@
+#Script para saber quais são as obras visíveis no app:
+
+library(RPostgreSQL)
+library(dplyr)
+library(data.table)
+
+#filtros
+type_of_project <- data.frame(name = c("enlargement", "construction", "school_with_project_prepared_by_grantor", "school_with_project_prepared_by_the_proponent", "type_a_kindergarten", "type_b_kindergarten", "type_c_kindergarten", "educational_space_1_room", "educational_space_2_room", "educational_space_4_room", "educational_space_6_room", "educational_space_8_room", "educational_space_10_room", "educational_space_12_room", "educational_background_high_school_vocational", "mi_kindergarten_type_b", "mi_kindergarten_type_c", "conventional_design_1",  "conventional_design_2",  "renovation"), 
+                              number = c(1:20))
+
+filtro <- c("educational_space_1_room", "educational_space_2_room", "educational_space_4_room", "educational_space_6_room", "educational_space_12_room", "conventional_design_1", "conventional_design_2")                        
+
+tp <- type_of_project %>%
+  filter(name %in% filtro)
+
+tpn <- tp$number
+
+# Conectando com o banco
+
+pg = dbDriver("PostgreSQL")
+
+con = dbConnect(pg,
+                user="read_only_user", password="pandoapps",
+                host ="aag6rh5j94aivq.cxbz7geveept.sa-east-1.rds.amazonaws.com",
+                port = 5432, dbname="ebdb")
+
+dbListTables(con)
+
+alertas = dbGetQuery(con, "SELECT * FROM projects WHERE (visible = TRUE) OR ((status IN (1,3,4,6,7,8,9)) AND (type_of_project IN (8,9,10,11,14,18,19)) AND (funded_by = 1) )")
+
+Encoding(alertas$name) <- "UTF-8"
+Encoding(alertas$address) <- "UTF-8"
+Encoding(alertas$clean_name) <- "UTF-8"
+Encoding(alertas$geocoder_city) <- "UTF-8"
+Encoding(alertas$geocoder_address) <- "UTF-8"
+
+obras_visiveis <- alertas %>%
+  mutate(visible = ifelse(is.na(visible), "TRUE", visible)) %>%
+  filter(visible != "FALSE")
