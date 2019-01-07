@@ -26,14 +26,14 @@ con = dbConnect(pg,
 
 dbListTables(con)
 
-alertas = dbGetQuery(con, "SELECT * FROM projects WHERE (visible = TRUE) OR ((status IN (1,3,4,6,7,8,9)) AND (type_of_project IN (8,9,10,11,14,18,19)) AND (funded_by = 1) )")
+obras_app = dbGetQuery(con, "SELECT * FROM projects WHERE (visible = TRUE) OR ((status IN (1,3,4,6,7,8,9)) AND (type_of_project IN (8,9,10,11,14,18,19)) AND (funded_by = 1) )")
 
-Encoding(alertas$name) <- "UTF-8"
-Encoding(alertas$address) <- "UTF-8"
-Encoding(alertas$clean_name) <- "UTF-8"
-Encoding(alertas$geocoder_city) <- "UTF-8"
-Encoding(alertas$geocoder_address) <- "UTF-8"
+Encoding(obras_app$name) <- "UTF-8"
+Encoding(obras_app$address) <- "UTF-8"
+Encoding(obras_app$clean_name) <- "UTF-8"
+Encoding(obras_app$geocoder_city) <- "UTF-8"
+Encoding(obras_app$geocoder_address) <- "UTF-8"
 
-obras_visiveis <- alertas %>%
+obras_visiveis <- obras_app %>%
   mutate(visible = ifelse(is.na(visible), "TRUE", visible)) %>%
   filter(visible != "FALSE")
