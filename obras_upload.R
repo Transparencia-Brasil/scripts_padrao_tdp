@@ -1,7 +1,7 @@
-
 #Script para upar plhanilha no admin do TDP
 
 library(dplyr)
+library(janitor)
 
 #inserindo obras SIMEC
 
@@ -20,6 +20,19 @@ obras[] <- lapply(obras, gsub, pattern=';', replacement='/')
 #inserindo o header padrão
 #isso é necessário porque o SIMEC muda o header o tempo todo.
 
+
+quadras <- c("QUADRA ESCOLAR COBERTA COM PALCO- PROJETO FNDE",   
+             "QUADRA ESCOLAR COBERTA COM VESTIÁRIO- PROJETO FNDE",
+             "QUADRA ESCOLAR COBERTA - PROJETO PRÓPRIO",                         
+             "COBERTURA DE QUADRA ESCOLAR PEQUENA - PROJETO FNDE", 
+             "COBERTURA DE QUADRA ESCOLAR GRANDE - PROJETO FNDE", 
+             "COBERTURA DE QUADRA ESCOLAR - PROJETO PRÓPRIO",      
+             "Quadra Escolar Coberta e Vestiário - Modelo 2")        
+
+obras <- obras %>%
+  clean_names() %>%
+  mutate(nome = toupper(nome),
+         nome = ifelse(grepl("QUADRA", nome) & tipo_do_projeto %in% quadras , nome, paste0("QUADRA ", nome))) 
 
 names(obras) <- c( "ID"                                            
                    , "Nome"                                          
