@@ -14,6 +14,11 @@ A API do TDP exige um token de autorização. Você obtem esse token na document
 
 O script abaixo retornará um *dataframe* contendo todas as informações armazenadas no aplicativo Tá de Pé sobre as obras visíveis no app.
 
+Apenas duas coisas precisarão ser alteradas no script abaixo: o token e o n.
+O n é o número de páginas da consulta. Quando realizamos a consulta na API do TDP são exibidas 10 entradas por página. Hoje a quantidade de obras visíveis no app é 6033, portanto 604 páginas. Se você entende um pouco mais de APIs, você pode rodar uma consulta no console da documentação das APIs ( Obter obras >> Projects , marcar o visible = 1 ) e olhar o "count" dentro do parâmetro "meta" no final da consulta e dividir esse número por 10, esse será o número de páginas necessárias para coletar todas as informações. 
+
+O *dataframe* resultante da consulta abaixo será o objeto *obras_visiveis*
+
 ```r
 library(httr)
 library(jsonlite)
@@ -21,7 +26,7 @@ library(jsonlite)
 #Obras visíveis no app
 
 #número de obras visíveis que dá no meta da consulta no browser
-n <- 6000  
+n <- 604  
 
 pagina <- c(1:n)
 
@@ -50,3 +55,9 @@ for(i in 1: length(pagina)){
   Sys.sleep(.25)
 }
 ```
+
+### Consulta de alertas recebidos
+
+### Consulta de respostas recebidas
+
+
