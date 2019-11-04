@@ -58,6 +58,40 @@ for(i in 1: length(pagina)){
 
 ### Consulta de alertas recebidos
 
+Nesse exemplo, vou fazer a consulta para uma série de projetos que estão dentro do objeto ids
+
+```{r}
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+#Obras visíveis no app
+
+ids <- c("1006408", "1006409", "1010358", "1006332", "1006593", "1009183")
+
+token_tdp <- " "
+
+alertas <- data.frame()
+
+for(i in 1:length(ids)){
+  
+  print(ids[i])
+  url <- paste0("http://tadepe.transparencia.org.br/api/inspections/content?project_id=", ids[i])
+  
+  request <- GET(url, add_headers(Authorization = token_tdp))
+  print(request$status_code)
+  
+  response <- content(request, as = "text", encoding = "UTF-8")
+  
+  df <- fromJSON(response, flatten = TRUE) 
+  df <- df[[1]]
+  
+  alertas <-  rbind(alertas, df)
+  print(url)
+  }
+```
+
+
 ### Consulta de respostas recebidas
 
 
