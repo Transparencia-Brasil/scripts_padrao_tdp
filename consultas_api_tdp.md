@@ -58,9 +58,9 @@ for(i in 1: length(pagina)){
 
 ### Consulta de alertas recebidos
 
-Nesse exemplo, vou fazer a consulta para uma série de projetos que estão dentro do objeto ids
+Nesse exemplo, vou fazer a consulta para uma série de projetos que estão dentro do objeto `ids`
 
-```{r}
+```r
 library(httr)
 library(jsonlite)
 library(dplyr)
@@ -94,4 +94,25 @@ for(i in 1:length(ids)){
 
 ### Consulta de respostas recebidas
 
+Aqui está um exemplo de consulta às respostas do TDP.
+No caso, eu optei por selecionar as respostas pelos ids dos alertas. Mas se eu quisesse trabalhar com o id dos projetos eu poderia ter terminado a consulta com `project_id=1009156`. Os ids dos alertas estão dentro do objeto `inspection_ids`.
+O interessante é que caso o alerta ainda não tenha uma resposta, a consulta terá sucesso (status_code == 200) mas o df que será acrescido vai estar em branco. Por isso eu não precisei colocar condicionais (if) nessa consulta. 
 
+```r
+
+inspection_ids <- c("223", "224", "225")
+
+respostas <- data.frame()
+
+for(i in 1:length(inspection_ids)){
+  
+  url <- paste0("http://tadepe.transparencia.org.br/api/answers/content?inspection_id=", inspection_ids[i])
+  request <- GET(url, add_headers(Authorization = token_tdp))
+  print(request$status_code)
+  response <- content(request, as = "text", encoding = "UTF-8")
+  df <- fromJSON(response, flatten = TRUE) 
+  df <- df[[1]]
+  respostas <- rbind(respostas, df)
+}
+
+```
