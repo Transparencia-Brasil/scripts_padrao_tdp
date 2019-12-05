@@ -5,7 +5,7 @@ library(janitor)
 
 #inserindo obras SIMEC
 
-obras <- read.csv(url("http://simec.mec.gov.br/painelObras/download.php"), sep=";")
+obras <- read.csv("", sep=";")
 
 #importante: essa planilha não lê NAs , porque foi assim
 # que o SIMEC deixou. Para outros scripts inserir na.strings="" nos parâmetros
@@ -32,7 +32,8 @@ quadras <- c("QUADRA ESCOLAR COBERTA COM PALCO- PROJETO FNDE",
 obras <- obras %>%
   clean_names() %>%
   mutate(nome = toupper(nome),
-         nome = ifelse(grepl("QUADRA", nome) & tipo_do_projeto %in% quadras , nome, paste0("QUADRA ", nome))) 
+         nome = ifelse(tipo_do_projeto %in% quadras & !grepl("QUADRA", nome), paste0("QUADRA ", nome), nome)) %>%
+  filter(!is.na(nome))
 
 names(obras) <- c( "ID"                                            
                    , "Nome"                                          
@@ -97,10 +98,7 @@ hj <- Sys.Date()
 
 #colocar pasta de destino:
 
-dir <- getwd()
-pasta <- paste0(dir, "/", "planilhas_upload")
-
-setwd(pasta)
+setwd()
 
 write.table(obras, file=paste0("obras", hj, ".csv"), sep=";", 
             fileEncoding = "utf-8", row.names = FALSE,
